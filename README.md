@@ -1,8 +1,7 @@
 # SalesVision AI
 
 ## Live Demo
-
-*Will be added after deployment.*
+https://salesvisionai-yashti.streamlit.app/
 
 ## Intelligent Sales Analytics & Forecasting Dashboard
 
@@ -213,16 +212,24 @@ The dataset serves as the foundation for exploratory analysis, forecasting, anom
 ## Screenshots
 
 ### Sales Overview Dashboard
-*(Add screenshot here)*
+<img width="1918" height="913" alt="Screenshot 2026-07-08 202928" src="https://github.com/user-attachments/assets/7e5fb73d-27a5-4bb7-8d5a-6daa9eafa3b9" />
+
+<img width="1900" height="898" alt="Screenshot 2026-07-08 202958" src="https://github.com/user-attachments/assets/6daa60eb-de34-4462-a7c4-c867e01b23c6" />
 
 ### Forecast Explorer
-*(Add screenshot here)*
+<img width="1911" height="911" alt="Screenshot 2026-07-08 203106" src="https://github.com/user-attachments/assets/f2ab72a1-55d6-4f46-b3a9-310e296b3157" />
 
 ### Anomaly Report
-*(Add screenshot here)*
+<img width="1897" height="901" alt="Screenshot 2026-07-08 203217" src="https://github.com/user-attachments/assets/eaec38f3-362f-4ac3-bb92-aed715a93c4d" />
+
+<img width="1890" height="905" alt="Screenshot 2026-07-08 203231" src="https://github.com/user-attachments/assets/46503b17-a1cc-4b4a-82bc-e8570dc7aab2" />
 
 ### Product Demand Segments
-*(Add screenshot here)*
+<img width="1897" height="897" alt="Screenshot 2026-07-08 203308" src="https://github.com/user-attachments/assets/3bd1533c-de10-43c4-a35e-89778df25502" />
+
+<img width="1187" height="863" alt="Screenshot 2026-07-08 203336" src="https://github.com/user-attachments/assets/71d2ff79-2755-49b5-b8dd-142054ef949a" />
+
+<img width="1885" height="900" alt="Screenshot 2026-07-08 203405" src="https://github.com/user-attachments/assets/400add58-fd57-42c7-989e-22bb87160ca7" />
 
 ## Author
 

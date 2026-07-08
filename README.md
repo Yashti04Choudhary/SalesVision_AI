@@ -1,8 +1,7 @@
 # SalesVision AI
 
 ## Live Demo
-
-*Will be added after deployment.*
+https://salesvisionai-yashti.streamlit.app/
 
 ## Intelligent Sales Analytics & Forecasting Dashboard
 

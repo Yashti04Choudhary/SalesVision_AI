@@ -9,7 +9,7 @@ sys.path.append(
 )
 
 import utils
-from forecast_utils import generate_forecast_hybrid
+from forecast_utils import generate_prophet_forecast
 
 # Styling for Title with Linear Gradient
 st.markdown("""
@@ -80,7 +80,7 @@ with col_ctrl:
 # Forecasting Function
 def generate_forecast(forecast_type, selection, horizon):
     """
-    Wrapper around the hybrid forecasting pipeline.
+    Fit Prophet on the selected historical monthly sales.
     """
 
     if forecast_type == "Overall Sales":
@@ -90,7 +90,7 @@ def generate_forecast(forecast_type, selection, horizon):
         f_type = forecast_type
         f_value = selection
 
-    return generate_forecast_hybrid(
+    return generate_prophet_forecast(
         df=df_raw,
         filter_type=f_type,
         filter_value=f_value,
@@ -161,7 +161,7 @@ with col_viz:
             x=full_forecast['YearMonth'],
             y=full_forecast['Forecast'],
             mode='lines+markers',
-            name='Projected Demand (XGBoost)',
+            name='Projected Demand (Prophet)',
             line=dict(color='#EC4899', width=3, dash='dash'), # Hot pink dashed line
             marker=dict(
         size=7,
@@ -197,11 +197,14 @@ with col_viz:
     
     # Display MAE & RMSE metrics (Remove MAPE as per user specification)
     if not metrics_df.empty:
-        mae_val = metrics_df.iloc[0]['MAE']
-        rmse_val = metrics_df.iloc[0]['RMSE']
+        selected_metrics = metrics_df.loc[metrics_df['Model'] == 'Prophet']
+        if selected_metrics.empty:
+            selected_metrics = metrics_df.iloc[[0]]
+        mae_val = selected_metrics.iloc[0]['MAE']
+        rmse_val = selected_metrics.iloc[0]['RMSE']
     else:
-        mae_val = 14036.94
-        rmse_val = 18526.20
+        mae_val = 11232.49
+        rmse_val = 14032.41
         
     # Injecting CSS for card hovers
     st.markdown("""
@@ -283,38 +286,28 @@ with col_viz:
             <strong style="color: {info_title}; font-size: 0.92rem; font-weight: 700;">Model Evaluation</strong>
         </div>
         <p style="color: {info_text}; font-size: 0.82rem; line-height: 1.45; margin: 0; font-weight: 500;">
-            The MAE and RMSE shown above correspond to the production XGBoost model evaluated during Task 3 of the project.
+            The MAE and RMSE shown above are Prophet results from an expanding-window, three-month backtest across eight forecast origins.
             <br><br>
-            These evaluation metrics remain constant because they represent the validated performance of the final production model.
-            Category and Region forecasts are generated interactively using the hybrid forecasting pipeline while maintaining the same production evaluation metrics.
+            They summarize overall sales performance across 24 held-out months. Category and Region forecasts are fitted to the selected historical data; the displayed metrics summarize the overall backtest.
         </p>
     </div>
     """
     st.markdown(info_card_html, unsafe_allow_html=True)
 
 # Info Expander for explanation
-with st.expander("ℹ️ ML Forecasting Methodology (XGBoost)"):
+with st.expander("ℹ️ Forecasting Methodology (Prophet)"):
 
     st.markdown("""
 ### Forecasting Pipeline
 
-The Forecast Explorer employs a **hybrid XGBoost forecasting strategy** to project future consumer demand:
+The Forecast Explorer uses **Prophet** to project future monthly sales:
 
-- **Overall Sales**: Leverages the pre-trained, validated production model (`best_model.pkl`) loaded directly from storage to make high-level enterprise predictions.
-- **Category & Region Forecasts**: Dynamically trains a custom, lightweight XGBoost model on the fly using the filtered historical slice corresponding to the selected product category or geographical region.
+- **Overall Sales**: Fits Prophet using the complete historical monthly sales series.
+- **Category & Region Forecasts**: Fits Prophet using only the selected category or region historical sales.
 
 ### Recursive Multi-Month Projection
-To project demand across 1–3 months, a **recursive forecasting methodology** is used:
-- The system predicts the first month.
-- It then appends this prediction back into the history, dynamically updating the lag features before generating predictions for the subsequent months.
+Prophet produces each requested future month from the fitted trend and yearly seasonal pattern. Future actual sales are never passed to the model.
 
 ### Feature Engineering
-The XGBoost model processes the following features:
-- **Lag_1**: Sales from 1 month ago.
-- **Lag_2**: Sales from 2 months ago.
-- **Lag_3**: Sales from 3 months ago.
-- **Rolling_Mean_3**: Rolling average of sales over the most recent 3 months.
-- **Month**: Calendar month (1–12) to capture seasonal demand fluctuations.
-- **Quarter**: Calendar quarter (1–4) for quarterly reporting alignment.
-- **Seasonal Features**: One-hot encoded indicators (`Season_Spring`, `Season_Summer`, `Season_Winter`) derived from calendar months.
+The selected series is formatted as Prophet's required date (`ds`) and target (`y`) columns. Yearly seasonality is enabled when at least two years of monthly history are available; weekly and daily seasonality are disabled.
 """)

@@ -45,18 +45,18 @@ def load_metrics(metrics_path: str) -> pd.DataFrame:
         st.warning(f"⚠️ Evaluation metrics file not found: `{metrics_path}`. Showing default placeholders.")
         # Default placeholder metrics
         return pd.DataFrame([{
-            "Model": "XGBoost",
-            "MAE": 14036.94,
-            "RMSE": 18526.20,
-            "MAPE": 13.52
+            "Model": "Prophet",
+            "MAE": 11232.49,
+            "RMSE": 14032.41,
+            "MAPE": 22.88
         }])
     try:
         return pd.read_csv(metrics_path)
     except Exception as e:
         st.error(f"❌ Error loading metrics from `{metrics_path}`: {str(e)}")
         return pd.DataFrame([{
-            "Model": "XGBoost",
-            "MAE": 14036.94,
-            "RMSE": 18526.20,
-            "MAPE": 13.52
+            "Model": "Prophet",
+            "MAE": 11232.49,
+            "RMSE": 14032.41,
+            "MAPE": 22.88
         }])

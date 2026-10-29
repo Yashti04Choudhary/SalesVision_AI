@@ -25,7 +25,7 @@ SalesVision AI is designed for retail executives, store managers, and supply cha
 
 - **Modern Responsive Streamlit Interface**: Clean multi-page dashboard with intuitive navigation, interactive visualizations, and responsive layouts.
 - **Interactive Filtering**: Filter sales data by category, region, forecast scope, and product demand clusters to perform focused analysis.
-- **Hybrid Multi-Horizon Forecaster**: Combines pre-trained production XGBoost models with on-the-fly XGBoost regressors to project future sales with recursive lag updates.
+- **Prophet Multi-Horizon Forecaster**: Fits a Prophet model to the selected monthly sales history and projects future sales up to three months.
 - **Dual Outlier Detection**: Side-by-side execution of unsupervised Isolation Forests and statistical Rolling Z-Score computations.
 - **2D PCA Demand Segmentation**: Maps high-dimensional transaction profiles to optimized K-Means clusters, visualized with interactive dimensions.
 
@@ -41,11 +41,11 @@ SalesVision AI is designed for retail executives, store managers, and supply cha
 - **Dynamic Filters**: Quick sidebars to segment data by Category and Region.
 
 ### Page 2 – Forecast Explorer
-- **Hybrid Forecasting Pipeline**: Loads a pre-trained serialized model for overall projections and dynamically trains lightweight models for individual segments.
+- **Prophet Forecasting Pipeline**: Fits Prophet on overall or filtered monthly sales history.
 - **Flexible Scope Selection**: Forecast overall sales, specific product categories, or regions.
 - **Adjustable Horizon**: Slide controls to predict 1, 2, or 3 months ahead recursively.
 - **Historical vs. Predicted Visuals**: Overlaid historical sales time series alongside recursive predictions.
-- **Model Evaluation Card**: Displays evaluation metrics (MAE, RMSE, MAPE) for the production forecasting model.
+- **Model Evaluation Card**: Displays Prophet MAE and RMSE from an expanding-window backtest over eight three-month forecast windows (24 held-out months).
 
 ### Page 3 – Anomaly Report
 - **Outlier Detection Algorithms**: Choose between **Isolation Forest** (multivariate unsupervised) and **Rolling Z-Score** (rolling statistics).
@@ -71,10 +71,7 @@ SalesVision AI leverages a robust machine learning backend containing the follow
   - *Rolling Mean*: 3-month rolling window sales average (`Rolling_Mean_3`).
   - *Calendar Properties*: Numeric extraction of `Month` and `Quarter`.
   - *One-Hot Seasons*: Encoded indicators for `Season_Spring`, `Season_Summer`, and `Season_Winter`.
-- **Hybrid Forecasting Pipeline**:
-  - **Overall Sales**: Loaded production model (`best_model.pkl`) built using hyperparameter-optimized XGBoost regressors.
-  - **Filtered Segment Sales**: Trains custom `XGBRegressor` estimators on the fly for the selected category/region slice.
-  - **Recursive Multi-Step Inference**: Projects future months sequentially, shifting predictions back into lag variables and recalculating rolling means before the next step.
+- **Forecast Model Comparison**: SARIMA, Prophet, and recursive XGBoost are compared with an expanding-window backtest. Every fold trains on earlier months and forecasts the next three; metrics summarize the same 24 held-out months. Prophet is selected for the dashboard based on the lowest MAE and RMSE in this evaluation.
 - **Unsupervised Anomaly Analysis**:
   - **Isolation Forest**: Splits features recursively to flag hard-to-isolate outliers.
   - **Rolling Z-Score**: Evaluates deviations relative to a rolling mean and standard deviation window.
@@ -92,14 +89,11 @@ SalesForecasting_Yashti/
 │
 ├── app.py                     # Main dashboard page routing, global CSS styles, and footer
 ├── utils.py                   # Caching utilities for dataset loading and metric loading
-├── forecast_utils.py          # Machine learning hybrid forecasting & recursive logic
+├── forecast_utils.py          # Prophet monthly forecasting logic
 ├── analysis.ipynb             # Jupyter Notebook covering EDA, training, and modeling
 ├── train.csv                  # Raw Superstore transaction dataset
 ├── requirements.txt           # Python package dependencies
 ├── README.md                  # System documentation
-│
-├── models/
-│     └── best_model.pkl       # Saved serialized production XGBoost model
 │
 ├── charts/                    # Static anomaly and demand cluster graphics
 │     ├── cluster_plot.png
@@ -172,7 +166,8 @@ The project relies on the following core libraries:
 - **Plotly** (interactive HTML plotting library)
 - **Matplotlib** (static visualization generation)
 - **Scikit-learn** (KMeans clustering, PCA, StandardScaler, Isolation Forest)
-- **XGBoost** (regression modeling for forecasts)
+- **XGBoost** (forecast comparison model)
+- **Prophet** (dashboard forecasting model)
 - **Statsmodels** (time series analysis utilities)
 - **Joblib** (model serialization and caching)
 
